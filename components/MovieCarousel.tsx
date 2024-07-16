@@ -6,13 +6,14 @@ import { useFetchMovies } from "@/api/getApi/getApi";
 import Image from "next/image";
 import { Icon } from "@iconify/react";
 
-interface Movie {
+export interface Movie {
   id: number;
   title: string;
   overview: string;
   backdrop_path: string;
   vote_average: number;
   poster_path: string;
+  release_date : string;
 }
 
 interface MovieCarouselProps {

@@ -30,7 +30,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <QueryClientProvider client={queryClient}>
           <SelectedMovieProvider>
-            <Navbar />
+            <Navbar  />
             {children}
           </SelectedMovieProvider>
         </QueryClientProvider>
