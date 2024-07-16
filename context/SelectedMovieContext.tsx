@@ -3,8 +3,9 @@ import React, { createContext, useContext, useState, ReactNode } from "react";
 interface Movie {
   id: number;
   title: string;
-  description: string;
+  overview: string;
   backdrop_path: string;
+  vote_average:number
 }
 
 interface SelectedMovieContextProps {
@@ -15,8 +16,9 @@ interface SelectedMovieContextProps {
 const defaultMovie: Movie = {
   id: 0,
   title: "Movie Title",
-  description: "Movie Description",
+  overview: "Movie Description",
   backdrop_path: "",
+  vote_average:10
 };
 
 const SelectedMovieContext = createContext<SelectedMovieContextProps>({

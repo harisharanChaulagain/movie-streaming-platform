@@ -1,10 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import logo from "../assets/logo.png";
 import { motion } from "framer-motion";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const navItems = [
   {
@@ -34,6 +35,7 @@ const listVariants = {
     },
   },
 };
+
 const listItemVariants = {
   closed: {
     x: -10,
@@ -47,42 +49,115 @@ const listItemVariants = {
 
 export default function Navbar() {
   const [mobileNav, setMobileNav] = useState<boolean>(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState<boolean>(false);
+  const path = usePathname();
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      profileRef.current &&
+      !profileRef.current.contains(event.target as Node)
+    ) {
+      setProfileMenuOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
-    <header className="bg-black/50 fixed top-0 w-full z-50">
-      <div className="flex justify-between items-center py-2 w-full px-4 md:px-10 lg:px-16 xl:px-28">
-        <div className="flex items-center">
-          <Image
-            src={logo}
-            alt="logo"
-            className="h-8 w-auto object-contain cursor-pointer"
-          />
-        </div>
-        <div className="hidden md:flex justify-center items-center gap-8">
-          {navItems.map((item, index) => (
-            <Link key={index} href={item.id}>
-              <div className="text-[14px] cursor-pointer text-[#878787] hover:text-yellow-500">
-                {item.title}
-              </div>
-            </Link>
-          ))}
-        </div>
-        <div className="flex items-center ">
-          <div className="hidden md:flex justify-center items-center cursor-pointer ">
-            <Icon
-              icon="mingcute:user-4-fill"
-              className="text-4xl text-yellow-500"
+    <header className="bg-black/50 fixed top-0 w-full z-50 h-24 sm:h-16 flex justify-center items-center">
+      <div className="w-full px-4 md:px-10 lg:px-16 xl:px-28">
+        <div className="flex justify-between items-center py-2">
+          <Link href="/" className="flex items-center flex-shrink-0">
+            <Image
+              src={logo}
+              alt="logo"
+              className="h-8 sm:h-6 w-auto object-contain cursor-pointer"
             />
+          </Link>
+          <div className="relative hidden sm:flex justify-center items-center gap-8">
+            {navItems.map((item, index) => (
+              <Link key={index} href={item.id}>
+                <div
+                  className={`text-sm sm:text-base xl:text-lg 2xl:text-xl cursor-pointer text-white hover:text-yellow-500 transition-all duration-300 ${
+                    path === item?.id ? "text-yellow-500" : ""
+                  }`}
+                >
+                  {item.title}
+                </div>
+              </Link>
+            ))}
           </div>
-          <div
-            className="md:hidden flex justify-center items-center z-50 cursor-pointer w-10 h-8 text-2xl"
-            onClick={() => setMobileNav((prev) => !prev)}
-          >
-            {mobileNav ? (
-              <Icon icon="ic:baseline-close" />
-            ) : (
-              <Icon icon="ic:baseline-menu" />
-            )}
+
+          {/* Search Input for Large Screens */}
+
+          <div className="flex gap-4 items-center">
+            <div className="relative hidden sm:flex items-center">
+              <input
+                type="text"
+                placeholder="Search..."
+                className="bg-black/20 rounded-lg px-4 py-2 focus:outline-none text-yellow-500 placeholder-white"
+              />
+              <div className="absolute right-4 cursor-pointer text-yellow-500">
+                <Icon
+                  icon="ic:baseline-search"
+                  className="text-2xl md:text-3xl"
+                />
+              </div>
+            </div>
+            <div
+              className="relative flex justify-center items-center cursor-pointer"
+              ref={profileRef}
+              onClick={() => setProfileMenuOpen((prev) => !prev)}
+            >
+              <Icon
+                icon="mingcute:user-4-fill"
+                className="text-2xl sm:text-4xl text-yellow-500"
+              />
+              {profileMenuOpen && (
+                <div className="absolute top-10 right-0 bg-white rounded-sm shadow-lg p-2 z-50">
+                  <ul className="flex flex-col">
+                    <li className="flex items-center cursor-pointer text-black hover:text-yellow-500 transition-all duration-300">
+                      <Icon icon="mdi:account" className="mr-2" />
+                      Profile
+                    </li>
+                    <li className="flex items-center cursor-pointer text-black hover:text-yellow-500 transition-all duration-300">
+                      <Icon icon="mdi:logout" className="mr-2" />
+                      Logout
+                    </li>
+                  </ul>
+                </div>
+              )}
+            </div>
+            <div
+              className="sm:hidden flex justify-center items-center z-50 cursor-pointer w-10 h-8 text-2xl text-yellow-500"
+              onClick={() => setMobileNav((prev) => !prev)}
+            >
+              {mobileNav ? (
+                <Icon icon="ic:baseline-close" className="text-yellow-500" />
+              ) : (
+                <Icon icon="ic:baseline-menu" className="text-yellow-500" />
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Search Icon for Small Screens */}
+        <div className="sm:hidden flex items-center">
+          <div className="relative flex justify-center items-center w-full">
+            <input
+              type="text"
+              placeholder="Search..."
+              className="w-full bg-black/50 rounded-lg px-2 py-1 focus:outline-none placeholder-white text-yellow-500"
+            />
+            <div className="absolute cursor-pointer text-yellow-500 right-4">
+              <Icon icon="ic:baseline-search" />
+            </div>
           </div>
         </div>
       </div>
@@ -92,24 +167,19 @@ export default function Navbar() {
           variants={listVariants}
           initial="closed"
           animate="opened"
-          className="fixed inset-0 h-screen bg-gray-200 flex flex-col items-center justify-center gap-8 text-2xl z-40"
+          className="fixed inset-0 h-screen bg-white flex flex-col items-center justify-center gap-8 text-2xl z-40"
         >
           {navItems.map((item, index) => (
             <motion.div variants={listItemVariants} key={index}>
               <Link
                 href={item.id}
-                className="bg text-white whitespace-nowrap cursor-pointer"
+                className="whitespace-nowrap cursor-pointer text-black hover:text-yellow-500"
                 onClick={() => setMobileNav((prev) => !prev)}
               >
                 {item.title}
               </Link>
             </motion.div>
           ))}
-          <motion.div variants={listItemVariants}>
-            <div className="text-white">
-              <Icon icon="ic:baseline-person" className="text-white" />
-            </div>
-          </motion.div>
         </motion.div>
       )}
     </header>
