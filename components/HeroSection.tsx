@@ -5,6 +5,7 @@ import { Icon } from "@iconify/react";
 import MovieCarousel from "./MovieCarousel";
 import { useFetchMovies } from "@/api/getApi/getApi";
 import { useSelectedMovie } from "@/context/SelectedMovieContext";
+import { HeroSkeleton } from "./SkeletonLoader";
 
 const HeroSection: React.FC = () => {
   const { data: movies, isLoading } = useFetchMovies();
@@ -17,9 +18,8 @@ const HeroSection: React.FC = () => {
   }, [movies, setSelectedMovie]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <HeroSkeleton />;
   }
-
 
   const renderStars = (rating: number) => {
     const stars = [];
